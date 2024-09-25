@@ -5,6 +5,7 @@ namespace MarkdownProccesor.Tokens.Types;
 public sealed class HeaderToken : Token
 {
     private uint _levelOfHeader;
+
     public override TokenType TypeOfToken => TokenType.Header;
     public override string Value => "#";
     public override string TagValue => _isOpeningTag ? $"<h{_levelOfHeader}>" : $"</h{_levelOfHeader}>";
