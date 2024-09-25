@@ -8,6 +8,7 @@ internal class MarkdownLexer : ILexer<List<Token>>
 {
     public List<Token> Tokenize(string markdownText)
     {
+        //заглушка
         return new List<Token>{
             new HeaderToken(2,true),new TextToken("Заголовок"), new HeaderToken(2,false)
         };

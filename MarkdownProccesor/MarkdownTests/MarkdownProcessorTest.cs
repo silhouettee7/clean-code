@@ -9,7 +9,7 @@ public class MarkdownProcessorTest
     {
         //Arrange
         var mdProcessor = new MarkdownToHtmlProcessor();
-        string mdTextInput = "##Заголовок";
+        string mdTextInput = "## Заголовок";
         string htmlTextExpected = "<h2>Заголовок</h2>";
         //Act
         string result = mdProcessor.ConvertToHtml(mdTextInput);
