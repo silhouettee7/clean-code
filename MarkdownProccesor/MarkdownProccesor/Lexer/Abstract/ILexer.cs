@@ -6,7 +6,7 @@ namespace MarkdownProccesor.Lexer.Abstract;
 /// Интерфейс отвечает за разбитие markdwon разметки на токены
 /// </summary>
 /// <typeparam name="T">Коллекция токенов</typeparam>
-public interface ILexer<out T> where T : ICollection<Token>
+public interface ILexer<out T> where T : ICollection<CompositeNode>
 {
     /// <summary>
     /// метод токенизации

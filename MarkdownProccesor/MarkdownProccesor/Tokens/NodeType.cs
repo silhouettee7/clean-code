@@ -1,7 +1,8 @@
 ﻿namespace MarkdownProccesor.Tokens;
 
-public enum TokenType
+public enum NodeType
 {
+    Document,
     Text,
     Bold,
     Italic,

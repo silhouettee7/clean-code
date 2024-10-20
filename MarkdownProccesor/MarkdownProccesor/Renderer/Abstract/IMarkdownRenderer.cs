@@ -6,7 +6,7 @@ namespace MarkdownProccesor.Renderer.Abstract;
 /// интерфейс отображения токенов в текст
 /// </summary>
 /// <typeparam name="T">коллекция токенов</typeparam>
-public interface IMarkdownRenderer<in T> where T : ICollection<Token>
+public interface IMarkdownRenderer<in T> where T : ICollection<CompositeNode>
 {
     /// <summary>
     /// метод рендера токенов

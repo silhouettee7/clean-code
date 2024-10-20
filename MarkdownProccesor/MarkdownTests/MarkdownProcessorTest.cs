@@ -2,17 +2,17 @@ using MarkdownProccesor;
 
 namespace MarkdownTests;
 
-public class MarkdownProcessorTest
-{
+public class MarkdownProcessorTest{
     [Fact]
+
     public void ConvertToHtmlTagShouldBeMatchHeaderTwoLevel()
     {
         //Arrange
         var mdProcessor = new MarkdownToHtmlProcessor();
-        string mdTextInput = "## Заголовок";
-        string htmlTextExpected = "<h2>Заголовок</h2>";
+        string mdTextInput = "\n## Заголовок _textboldtext _word_ \n";
+        string htmlTextExpected = "<html><h2>Заголовок _textboldtext <em>word</em> </h2></html>";
         //Act
-        string result = mdProcessor.ConvertToHtml(mdTextInput);
+        string result = mdProcessor.Convert(mdTextInput);
         //Assert
         Assert.Equal(htmlTextExpected, result);
     }

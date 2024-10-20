@@ -4,13 +4,10 @@ using MarkdownProccesor.Tokens.Types;
 
 namespace MarkdownProccesor.Lexer;
 
-internal class MarkdownLexer : ILexer<List<Token>>
+internal class MarkdownLexer : ILexer<List<CompositeNode>>
 {
-    public List<Token> Tokenize(string markdownText)
+    public List<CompositeNode> Tokenize(string markdownText)
     {
-        //заглушка
-        return new List<Token>{
-            new HeaderToken(2,true),new TextToken("Заголовок"), new HeaderToken(2,false)
-        };
+        throw new NotImplementedException();
     }
 }
