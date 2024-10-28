@@ -5,17 +5,16 @@ using MarkdownProccesor.Tokens.Abstract;
 using MarkdownProccesor.Tokens.Types;
 
 namespace MarkdownProccesor.Handlers;
-
-internal class HeaderNodeHandler : INodeHandler
+public class AllHandwritingHandler : INodeHandler
 {
-    public INodeHandler? Successor { get; set; }
+    public INodeHandler Successor { get ; set ; }
 
     public CompositeNode HandleWord(ProcessedWord word, CompositeNode currentNode)
     {
-        if (word.Value.All((element) => element == '#') && word.IsFirst)
+        if (word.Value.All((elem) => elem == '_'))
         {
-            var headerNode = new HeaderNode(currentNode, (uint)word.Value.Length);
-            return headerNode;
+            currentNode.Add(new TextNode(word.Value));
+            return currentNode;
         }
         return Successor.HandleWord(word, currentNode);
     }
