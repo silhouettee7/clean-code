@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using MarkdownProccesor.Tokens.Types;
+using System.Linq;
 using System.Text;
 
 namespace MarkdownProccesor.Tokens.Abstract;
@@ -6,12 +7,15 @@ namespace MarkdownProccesor.Tokens.Abstract;
 public abstract class CompositeNode: INode
 {
     protected List<INode> _childrenNode = new List<INode>();
-    public CompositeNode? Parent { get; }
+    public CompositeNode? Parent { get; set; }
+    public int PositionInParentChildren { get; }
+    public int CountOfChildren { get => _childrenNode.Count; }
     public abstract NodeType TypeOfNode { get; }
     public abstract string? Value { get; }
     public bool IsBeginInWord { get; set; }
     public bool IsEmpty { get => _childrenNode.Count == 0;  }
     public bool IsFinished { get; private set; }
+    public bool IsContainOppositeTag { get; set; }
     public virtual string? Represent()
     {
         IsFinished = true;
@@ -30,11 +34,13 @@ public abstract class CompositeNode: INode
     {
         _childrenNode.Remove(child);
     }
-    public (CompositeNode? first, INode? second) GetTwoLastChildren()
+    public void ReplaceNode(CompositeNode current, INode replacement)
     {
-        if (_childrenNode.Count < 2) return (null, null);
-        var twoLast = _childrenNode.TakeLast(2);
-        return (twoLast.First() as CompositeNode, twoLast.Last());
+        _childrenNode[current.PositionInParentChildren] = replacement;
+    }
+    public CompositeNode? GetLastCompositeNode()
+    {
+        return _childrenNode.OfType<CompositeNode>().LastOrDefault();
     }
     protected string? RepresentAllChildrenNodes()
     {
@@ -50,6 +56,7 @@ public abstract class CompositeNode: INode
     {
         Parent = parent;
         Parent.Add(this);
+        PositionInParentChildren = Parent.CountOfChildren - 1;
     }
 }
 

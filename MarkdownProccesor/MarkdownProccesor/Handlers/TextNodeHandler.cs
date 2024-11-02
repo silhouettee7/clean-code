@@ -1,4 +1,5 @@
 ﻿using MarkdownProccesor.Handlers.Abstract;
+using MarkdownProccesor.Handlers.Tools;
 using MarkdownProccesor.ProcessedObjects;
 using MarkdownProccesor.Tokens;
 using MarkdownProccesor.Tokens.Abstract;
@@ -13,32 +14,19 @@ internal class TextNodeHandler : INodeHandler
     public CompositeNode HandleWord(ProcessedWord word, CompositeNode currentNode)
     {
         word.ContextNode = NodeType.Text;
-        var currentChar = word.Current;
         var text = new StringBuilder();
-        while (currentChar != "_" && !word.IsProcessed)
+        while (word.Current != "_" && !word.IsProcessed)
         {
-            text.Append(currentChar);
-            word.AddCurrentIndexValue();
-            currentChar = word.Current;
+            if (word.Current == @"\") text.Append(EscapeSymbolHelper.HandleEscapeSymbols(word));
+            else
+            {
+                text.Append(word.Current);
+                word.AddCurrentIndexValue();
+            }   
         }
         if (word.IsProcessed)
         {
-            currentNode.Add(new TextNode(text.ToString() + ' '));
-            if (currentNode.TypeOfNode == NodeType.Italic && currentNode.IsBeginInWord)
-            {
-                var textNode = new TextNode("_" + currentNode.RepresentWithoutTags());
-                currentNode.Parent.Remove(currentNode);
-                currentNode = currentNode.Parent;
-                currentNode.Add(textNode);
-            }
-            if (currentNode.TypeOfNode == NodeType.Bold && currentNode.IsBeginInWord)
-            {
-                var textNode = new TextNode("__" + currentNode.RepresentWithoutTags());
-                currentNode.Parent.Remove(currentNode);
-                currentNode = currentNode.Parent;
-                currentNode.Add(textNode);
-            }
-            return currentNode;
+            return HandleNodesHelper.HandleEndWordIfNoClosingTag(currentNode, text.ToString());
         }
         else
         {

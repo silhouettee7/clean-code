@@ -5,6 +5,7 @@ using MarkdownProccesor.Tokens;
 using MarkdownProccesor.Handlers.Abstract;
 using MarkdownProccesor.Tokens.Types;
 using MarkdownProccesor.ProcessedObjects;
+using MarkdownProccesor.Handlers.Tools;
 namespace MarkdownProccesor.Handlers;
 
 public class MarkdownTextHandler
@@ -30,14 +31,14 @@ public class MarkdownTextHandler
     }
     private void HandleLine(string[] line)
     {
-        //if (line.Length == 1 && line[0] == string.Empty)
-        //{
-        //    while (_currentNode.TypeOfNode == NodeType.Italic || 
-        //        _currentNode.TypeOfNode == NodeType.Bold)
-        //    {
-
-        //    }
-        //}
+        if (line.Length == 0)
+        {
+            while (_currentNode.TypeOfNode == NodeType.Italic ||
+                _currentNode.TypeOfNode == NodeType.Bold)
+            {
+                _currentNode = HandleNodesHelper.ReplaceCurrentNodeWithTextNode(_currentNode, _currentNode.TypeOfNode);
+            }
+        }
         for (int i = 0; i < line.Length; i++)
         {
             var word = new ProcessedWord(line[i]);
