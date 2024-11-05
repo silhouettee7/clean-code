@@ -2,7 +2,6 @@
 using MarkdownProccesor.ProcessedObjects;
 using MarkdownProccesor.Tokens;
 using System.Text;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace MarkdownProccesor.Handlers.Tools;
 public static class EscapeSymbolHelper

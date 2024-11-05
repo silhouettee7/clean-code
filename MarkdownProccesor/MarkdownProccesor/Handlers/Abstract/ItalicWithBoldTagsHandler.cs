@@ -1,6 +1,4 @@
-﻿
-
-using MarkdownProccesor.Handlers.Tools;
+﻿using MarkdownProccesor.Handlers.Tools;
 using MarkdownProccesor.Tokens;
 using MarkdownProccesor.Tokens.Abstract;
 using MarkdownProccesor.Tokens.Types;

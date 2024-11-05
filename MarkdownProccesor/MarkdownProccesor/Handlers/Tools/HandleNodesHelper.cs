@@ -1,7 +1,6 @@
 ﻿using MarkdownProccesor.Tokens.Abstract;
 using MarkdownProccesor.Tokens;
 using MarkdownProccesor.Tokens.Types;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace MarkdownProccesor.Handlers.Tools;
 public static class HandleNodesHelper

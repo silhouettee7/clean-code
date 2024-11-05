@@ -1,7 +1,5 @@
 ﻿
 using MarkdownProccesor.Tokens;
-using MarkdownProccesor.Tokens.Abstract;
-using MarkdownProccesor.Tokens.Types;
 
 namespace MarkdownProccesor;
 
@@ -14,16 +12,4 @@ public static class TagMatching
         {NodeType.Text, ("","",1) },
     };
     
-}
-public static class NestedNodes
-{
-    public static List<TemporaryCompositeNode> NestedListsOfNodes { get; } = 
-        new List<TemporaryCompositeNode> () { new TemporaryCompositeNode() { typeOfNode = NodeType.Document } };
-}
-
-public class TemporaryCompositeNode
-{
-    public NodeType typeOfNode { get; set; }
-    public List<INode> ListOfNode { get; } = new();
-
 }
