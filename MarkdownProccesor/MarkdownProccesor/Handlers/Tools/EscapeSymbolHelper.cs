@@ -1,47 +1,53 @@
 ﻿
 using MarkdownProccesor.ProcessedObjects;
-using MarkdownProccesor.Tokens;
+using MarkdownProccesor.Nodes;
 using System.Text;
+using MarkdownProccesor.Tags;
+using MarkdownProccesor.Tags.Abstract;
 
 namespace MarkdownProccesor.Handlers.Tools;
 public static class EscapeSymbolHelper
 {
-    private static bool _isEscape = true;
     public static string HandleEscapeSymbols(ProcessedWord word)
     {
+        bool isEscape = true;
         var text = new StringBuilder();
         string specialSymbol = string.Empty;
         while (word.Current == "\\")
         {
-            if (_isEscape)
+            if (isEscape)
             {
                 text.Append("\\");
-                _isEscape = false;
+                isEscape = false;
             }
             else
             {
-                _isEscape = true;
+                isEscape = true;
             }
             word.AddCurrentIndexValue();
         }
-        if (IsEscapeSymbolStandsBeforeSpecial(ref specialSymbol, word, NodeType.Italic, NodeType.Bold))
+        if (text.Length != 0 && IsEscapeSymbolStandsBeforeSpecial(ref specialSymbol, word,
+            isEscape,
+            (NodeType.Bold, new BoldTag()),
+            (NodeType.Italic, new ItalicTag())
+            ))
         {
             text.Remove(text.Length-1,1);
             text.Append(specialSymbol);
         }
-        _isEscape = true;
         return text.ToString();
     }
     private static bool IsEscapeSymbolStandsBeforeSpecial(ref string special,
         ProcessedWord word, 
-        params NodeType[] specialSymbols)
+        bool isEscape,
+        params (NodeType nodeType, ITag tagType)[] specialSymbols)
     {
-        if (_isEscape) return false; 
+        if (isEscape) return false; 
         bool result = false;
         foreach(var type in specialSymbols)
         {
-            word.ContextNode = type;
-            result = word.Current == TagMatching.NodeTypeMatching[type].mdTag;
+            word.ContextNode = type.nodeType;
+            result = word.Current == type.tagType.MdTag;
             if (result)
             {
                 special = word.Current;

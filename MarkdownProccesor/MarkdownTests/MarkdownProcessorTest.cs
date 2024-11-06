@@ -1,4 +1,5 @@
 using MarkdownProccesor;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace MarkdownTests;
 
@@ -10,8 +11,8 @@ public class MarkdownProcessorTest
     public void ConvertToHtmlShouldBeHeaderTwoLevel()
     {
         //Arrange
-        string mdTextInput = "## Заголовок ";
-        string htmlTextExpected = "<html><h2>Заголовок </h2></html>";
+        string mdTextInput = "## Header ";
+        string htmlTextExpected = "<html><h2>Header </h2></html>";
         //Act
         string result = mdProcessor.ConvertToHtml(mdTextInput);
         //Assert
@@ -141,8 +142,8 @@ public class MarkdownProcessorTest
     }
 
     [Theory]
-    [InlineData("_text _text_", "<html>_text <em>text</em> </html>")]
-    [InlineData("__text __text__", "<html>__text <strong>text</strong> </html>")]
+    [InlineData("_text _text_", "<html><em>text _text</em> </html>")]
+    [InlineData("__text __text__", "<html><strong>text __text</strong> </html>")]
     [InlineData("__tex_t__", "<html><strong>tex_t</strong> </html>")]
     [InlineData("_tex__t_", "<html><em>tex__t</em> </html>")]
     public void PairTagWithoutClosingShouldBeStayHandwriting(string mdTextInput, string htmlTextExpected)
@@ -160,25 +161,29 @@ public class MarkdownProcessorTest
         Assert.Equal(htmlTextExpected, result);
     }
     [Theory]
-    [InlineData("_text __text _text\n\r", "<html>_text __text _text </html>")]
-    [InlineData("_text __text\n\r", "<html>_text __text </html>")]
-    [InlineData("__text\n\r", "<html>__text </html>")]
+    [InlineData("_text __text _text", "<html>_text __text _text </html>")]
+    [InlineData("_text __text", "<html>_text __text </html>")]
+    [InlineData("__text", "<html>__text </html>")]
     public void ManyOpeningTagsShouldBeStayHandwriting(string mdTextInput, string htmlTextExpected)
     {
         string result = mdProcessor.ConvertToHtml(mdTextInput);
         Assert.Equal(htmlTextExpected, result);
     }
 
-    //[Theory]
-    //[InlineData(@"\_text\_", "<html>_text_</html>")]
-
-    [Fact]
-    public void EscapeSymbolShouldEscape()
+    [Theory]
+    [InlineData(@"\_text\_", @"<html>_text_ </html>")]
+    [InlineData(@"\_text", @"<html>_text </html>")]
+    [InlineData(@"\__text", @"<html>__text </html>")]
+    [InlineData(@"\\_text_", @"<html>\<em>text</em> </html>")]
+    [InlineData(@"\\__text__", @"<html>\<strong>text</strong> </html>")]
+    [InlineData(@"\\\_text_", @"<html>\_text_ </html>")]
+    [InlineData(@"_text\\_", @"<html><em>text\</em> </html>")]
+    [InlineData(@"__text\__", @"<html>__text__ </html>")]
+    [InlineData(@"_text\_", @"<html>_text_ </html>")]
+    [InlineData(@"__text\\__", @"<html><strong>text\</strong> </html>")]
+    [InlineData(@"\\\\", @"<html>\\ </html>")]
+    public void EscapeSymbolShouldEscape(string mdTextInput, string htmlTextExpected)
     {
-        string mdTextInput = 
-            @"\_text\_ \_text \__text \\_text_ \\__text__ \\\_text_ _text\_ _text\\_ __text\__ __text\\__ \\\\ ";
-        string htmlTextExpected =
-            @"<html>_text_ _text __text \<em>text</em> \<strong>text</strong> \_text_ _text_ <em>text\</em> __text__ <strong>text\</strong> \\ </html>";
         string result = mdProcessor.ConvertToHtml(mdTextInput);
         Assert.Equal(htmlTextExpected, result);
     }
@@ -198,7 +203,15 @@ public class MarkdownProcessorTest
         string mdTextInput =
            "__text\n\r\n text__ ";
         string htmlTextExpected =
-            "<html>__text text__ </html>";
+            "<html>__text </br>text__ </html>";
+        string result = mdProcessor.ConvertToHtml(mdTextInput);
+        Assert.Equal(htmlTextExpected, result);
+    }
+    [Theory]
+    [InlineData("![image](image.png)", "<html><img src=\"image.png\" alt=\"image\"/> </html>")]
+    [InlineData("_text![image](image.png)text_", "<html><em>text<img src=\"image.png\" alt=\"image\"/>text</em> </html>")]
+    public void ImageShouldProcessCorrect(string mdTextInput, string htmlTextExpected)
+    {
         string result = mdProcessor.ConvertToHtml(mdTextInput);
         Assert.Equal(htmlTextExpected, result);
     }

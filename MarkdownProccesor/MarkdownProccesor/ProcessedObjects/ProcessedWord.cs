@@ -1,10 +1,18 @@
 ﻿
-using MarkdownProccesor.Tokens;
+using MarkdownProccesor.Nodes;
+using MarkdownProccesor.Tags;
+using MarkdownProccesor.Tags.Abstract;
 namespace MarkdownProccesor.ProcessedObjects;
 
 public class ProcessedWord
 {
     private int _currentIndex;
+    private readonly Dictionary<NodeType, ITag> _contextTags = new()
+    {
+        { NodeType.Bold, new BoldTag() },
+        { NodeType.Italic, new ItalicTag() },
+        { NodeType.Text, new TextTag() }
+    };
     public string? Value { get ; }
     public string Current
     {
@@ -42,12 +50,12 @@ public class ProcessedWord
     public bool IsBeginning { get => _currentIndex == 0; }
     public bool IsEnd
     {
-        get => _currentIndex == Value.Length - TagMatching.NodeTypeMatching[ContextNode].length;
+        get => _currentIndex == Value.Length - _contextTags[ContextNode].AtomicLength;
     }
     public NodeType ContextNode { get; set; } = NodeType.Text;
     public void AddCurrentIndexValue()
     {
-        _currentIndex += TagMatching.NodeTypeMatching[ContextNode].length;
+        _currentIndex += _contextTags[ContextNode].AtomicLength;
     }
     public ProcessedWord(string value)
     {

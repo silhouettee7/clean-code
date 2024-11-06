@@ -1,14 +1,14 @@
 ﻿
+using MarkdownProccesor.Nodes.Abstract;
+using MarkdownProccesor.Tags;
+using MarkdownProccesor.Tags.Abstract;
 
-using MarkdownProccesor.Tokens;
-using MarkdownProccesor.Tokens.Abstract;
-
-namespace MarkdownProccesor.Tokens.Types;
+namespace MarkdownProccesor.Nodes.Types;
 
 public class BoldNode : CompositeNode
 {
     public override NodeType TypeOfNode => NodeType.Bold;
-    public override string Value => "strong";
+    public override ITag Tag => new BoldTag();
     public BoldNode(CompositeNode parent) : base(parent) { }
     public override string? Represent()
     {
@@ -17,7 +17,7 @@ public class BoldNode : CompositeNode
     }
     private string RepresentWithMdTag()
     {
-        return "__" + RepresentAllChildrenNodes() + "__";
+        return Tag.MdTag + RepresentAllChildrenNodes() + Tag.MdTag;
     }
 
 }

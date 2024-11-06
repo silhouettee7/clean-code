@@ -1,10 +1,10 @@
 ﻿
 using MarkdownProccesor.ProcessedObjects;
-using MarkdownProccesor.Tokens.Abstract;
+using MarkdownProccesor.Nodes.Abstract;
 
 namespace MarkdownProccesor.Handlers.Abstract;
-public interface INodeHandler
+public interface IHandler
 {
-    INodeHandler Successor { get; set; }
+    IHandler Successor { get; set; }
     CompositeNode HandleWord(ProcessedWord word, CompositeNode currentNode);
 }

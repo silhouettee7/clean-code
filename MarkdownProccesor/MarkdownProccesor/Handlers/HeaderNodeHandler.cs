@@ -1,14 +1,14 @@
 ﻿
 using MarkdownProccesor.Handlers.Abstract;
 using MarkdownProccesor.ProcessedObjects;
-using MarkdownProccesor.Tokens.Abstract;
-using MarkdownProccesor.Tokens.Types;
+using MarkdownProccesor.Nodes.Abstract;
+using MarkdownProccesor.Nodes.Types;
 
 namespace MarkdownProccesor.Handlers;
 
-internal class HeaderNodeHandler : INodeHandler
+internal class HeaderNodeHandler : IHandler
 {
-    public INodeHandler? Successor { get; set; }
+    public IHandler? Successor { get; set; }
 
     public CompositeNode HandleWord(ProcessedWord word, CompositeNode currentNode)
     {

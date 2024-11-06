@@ -1,31 +1,34 @@
 ﻿using MarkdownProccesor.Handlers.Tools;
-using MarkdownProccesor.Tokens;
-using MarkdownProccesor.Tokens.Abstract;
-using MarkdownProccesor.Tokens.Types;
+using MarkdownProccesor.Nodes;
+using MarkdownProccesor.Nodes.Abstract;
+using MarkdownProccesor.Nodes.Types;
+using MarkdownProccesor.Tags;
+using MarkdownProccesor.Tags.Abstract;
 
 namespace MarkdownProccesor.Handlers.Abstract;
 public abstract class ItalicWithBoldTagsHandler: FormattingTagsHandler
 {
-    public NodeType OppositeTag { get => TagType == NodeType.Italic ? NodeType.Bold : NodeType.Italic; }
+    public abstract NodeType OppositeTagType { get; }
+    public abstract ITag OppositeTag { get; }
     public override CompositeNode HandleEndWord()
     {
         if (char.IsDigit(_word.Previous)) 
         {
-            return HandleNodesHelper.HandleEndWordIfBeforeClosingTagDigit(_currentNode, TagType);
+            return HandleNodesHelper.HandleEndWordIfNoClosingTag(_currentNode, Tag.MdTag);
         }
 
         if (_currentNode.TypeOfNode == TagType)
         {
             _currentNode = HandleEndWordIfTagType();
         }
-        else if (_currentNode.TypeOfNode == OppositeTag)
+        else if (_currentNode.TypeOfNode == OppositeTagType)
         {
             _currentNode = HandleEndNodeIfOppositeTag();
         }
         else
         {
             HandleIntersectTags();
-            _currentNode.Add(new TextNode(TagMatching.NodeTypeMatching[TagType].mdTag));
+            _currentNode.Add(new TextNode(Tag.MdTag));
         }
         _currentNode.Add(new TextNode(" "));
         return _currentNode;
@@ -34,7 +37,7 @@ public abstract class ItalicWithBoldTagsHandler: FormattingTagsHandler
     {
         if (char.IsDigit(_word.Next) || char.IsDigit(_word.Previous))
         {
-            _currentNode.Add(new TextNode(TagMatching.NodeTypeMatching[TagType].mdTag));
+            _currentNode.Add(new TextNode(Tag.MdTag));
             _word.AddCurrentIndexValue();
             return Successor.HandleWord(_word, _currentNode);
         }
@@ -43,7 +46,7 @@ public abstract class ItalicWithBoldTagsHandler: FormattingTagsHandler
         {
             _currentNode = HandleInsideWordIfTagType();
         }
-        else if (_currentNode.TypeOfNode == OppositeTag && _currentNode.IsBeginInWord)
+        else if (_currentNode.TypeOfNode == OppositeTagType && _currentNode.IsBeginInWord)
         {
             _currentNode = Successor.HandleWord(_word, HandleEndNodeIfOppositeTag());
         }
@@ -63,9 +66,9 @@ public abstract class ItalicWithBoldTagsHandler: FormattingTagsHandler
         if (sameNodeParent.TypeOfNode == TagType)
         {
             sameNodeParent.IsContainOppositeTag = true;
-            return HandleNodesHelper.ReplaceCurrentNodeWithTextNode(_currentNode, OppositeTag).Parent;
+            return HandleNodesHelper.GetParentWithReplacedToTextCurrentNode(_currentNode, OppositeTag, null).Parent;
         }            
-        return HandleNodesHelper.ReplaceCurrentNodeWithTextNode(_currentNode, OppositeTag, TagType);
+        return HandleNodesHelper.GetParentWithReplacedToTextCurrentNode(_currentNode, OppositeTag, Tag);
     }
     public virtual CompositeNode HandleInsideWordIfTagType()
     {
@@ -75,7 +78,7 @@ public abstract class ItalicWithBoldTagsHandler: FormattingTagsHandler
     {
         var lastCompositeNode = _currentNode.GetLastCompositeNode();
         if (lastCompositeNode == null) return;
-        if (lastCompositeNode.TypeOfNode == OppositeTag && lastCompositeNode.IsContainOppositeTag)
+        if (lastCompositeNode.TypeOfNode == OppositeTagType && lastCompositeNode.IsContainOppositeTag)
         {
             _currentNode.ReplaceNode(lastCompositeNode,
             TextNode.DecorateCurrentNodeToTextNode(lastCompositeNode, OppositeTag, OppositeTag));

@@ -1,21 +1,21 @@
 ﻿using MarkdownProccesor.Handlers.Abstract;
 using MarkdownProccesor.Handlers.Tools;
 using MarkdownProccesor.ProcessedObjects;
-using MarkdownProccesor.Tokens;
-using MarkdownProccesor.Tokens.Abstract;
-using MarkdownProccesor.Tokens.Types;
+using MarkdownProccesor.Nodes;
+using MarkdownProccesor.Nodes.Abstract;
+using MarkdownProccesor.Nodes.Types;
 using System.Text;
 
 namespace MarkdownProccesor.Handlers;
-internal class TextNodeHandler : INodeHandler
+internal class TextNodeHandler : IHandler
 {
-    public INodeHandler Successor { get ; set ; }
+    public IHandler Successor { get ; set ; }
 
     public CompositeNode HandleWord(ProcessedWord word, CompositeNode currentNode)
     {
         word.ContextNode = NodeType.Text;
         var text = new StringBuilder();
-        while (word.Current != "_" && !word.IsProcessed)
+        while (word.Current != "_" && word.Current != "!" && !word.IsProcessed)
         {
             if (word.Current == @"\") text.Append(EscapeSymbolHelper.HandleEscapeSymbols(word));
             else

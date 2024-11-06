@@ -1,22 +1,23 @@
-﻿using MarkdownProccesor;
-using MarkdownProccesor.Handlers.Abstract;
+﻿using MarkdownProccesor.Handlers.Abstract;
 using MarkdownProccesor.Handlers.Tools;
 using MarkdownProccesor.ProcessedObjects;
-using MarkdownProccesor.Tokens;
-using MarkdownProccesor.Tokens.Abstract;
-using MarkdownProccesor.Tokens.Types;
+using MarkdownProccesor.Nodes;
+using MarkdownProccesor.Nodes.Abstract;
+using MarkdownProccesor.Nodes.Types;
+using MarkdownProccesor.Tags.Abstract;
 
-public abstract class FormattingTagsHandler : INodeHandler
+public abstract class FormattingTagsHandler : IHandler
 { 
     protected ProcessedWord _word;
     protected CompositeNode _currentNode;
-    public INodeHandler Successor { get ; set; }
+    public IHandler Successor { get ; set; }
     public abstract NodeType TagType { get; }
     public abstract CompositeNodeFactory Factory { get; }
+    public abstract ITag Tag { get; }
     public CompositeNode HandleWord(ProcessedWord word, CompositeNode currentNode)
     {
         word.ContextNode = TagType;
-        if (word.Current != TagMatching.NodeTypeMatching[TagType].mdTag) return Successor.HandleWord(word, currentNode);
+        if (word.Current != Tag.MdTag) return Successor.HandleWord(word, currentNode);
         _word = word;
         _currentNode = currentNode;
         if (_word.IsBeginning)
@@ -35,37 +36,32 @@ public abstract class FormattingTagsHandler : INodeHandler
     }
     public virtual CompositeNode HandleBeginWord()
     {
-
         if (char.IsDigit(_word.Next))
         {
-            _currentNode.Add(new TextNode(TagMatching.NodeTypeMatching[TagType].mdTag));
+            _currentNode.Add(new TextNode(Tag.MdTag));
             _word.AddCurrentIndexValue();
-            return HandleWord(_word, _currentNode);
+            return Successor.HandleWord(_word, _currentNode);
         }
-        _word.AddCurrentIndexValue();
-        var node = Factory.CreateCompositeNode(_currentNode);       
-        var pair = GetSameNodeParentAndHisChild(node);
-        if (pair.parent != null)
+        _word.AddCurrentIndexValue();          
+        if (IsThereSameNodeParent())
         {
-            pair.parent.Remove(pair.childOfParent);
-            _currentNode = HandleNodesHelper.ReplaceCurrentNodeWithTextNode(pair.parent, TagType);
-            pair.childOfParent.Parent = _currentNode; // исправить этот момент
-            _currentNode.Add(pair.childOfParent);
+            _currentNode.Add(new TextNode(Tag.MdTag));
+            return Successor.HandleWord(_word, _currentNode);
         }
+        var node = Factory.CreateCompositeNode(_currentNode);
         return Successor.HandleWord(_word, node);
     }
     public abstract CompositeNode HandleEndWord();
     public abstract CompositeNode HandleInsideWord();   
-    protected (CompositeNode? parent, CompositeNode childOfParent) GetSameNodeParentAndHisChild(CompositeNode prevNode)
+    protected bool IsThereSameNodeParent()
     {
-        var tempNode = prevNode.Parent;
-        while (tempNode != null)
+        var tempNode = _currentNode;
+        while(tempNode != null)
         {
-            if (tempNode.TypeOfNode == TagType) break;
-            prevNode = tempNode;
+            if (tempNode.TypeOfNode == TagType) return true;
             tempNode = tempNode.Parent;
         }
-        return (tempNode,prevNode);
+        return false;
     }
     
     protected CompositeNode GetCreatedInWordNewNode()

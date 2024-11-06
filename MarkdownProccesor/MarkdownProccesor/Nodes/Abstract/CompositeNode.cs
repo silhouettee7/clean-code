@@ -1,25 +1,28 @@
-﻿using MarkdownProccesor.Tokens.Types;
+﻿using MarkdownProccesor.Nodes.Types;
+using MarkdownProccesor.Tags;
+using MarkdownProccesor.Tags.Abstract;
 using System.Linq;
 using System.Text;
 
-namespace MarkdownProccesor.Tokens.Abstract;
+namespace MarkdownProccesor.Nodes.Abstract;
 
 public abstract class CompositeNode: INode
 {
     protected List<INode> _childrenNode = new List<INode>();
-    public CompositeNode? Parent { get; set; }
+    public CompositeNode? Parent { get; }
     public int PositionInParentChildren { get; }
     public int CountOfChildren { get => _childrenNode.Count; }
     public abstract NodeType TypeOfNode { get; }
-    public abstract string? Value { get; }
     public bool IsBeginInWord { get; set; }
     public bool IsEmpty { get => _childrenNode.Count == 0;  }
     public bool IsFinished { get; private set; }
     public bool IsContainOppositeTag { get; set; }
+    public abstract ITag Tag { get; }
+
     public virtual string? Represent()
     {
         IsFinished = true;
-        return $"<{Value}>{RepresentAllChildrenNodes()}</{Value}>";
+        return $"<{Tag.HtmlTag}>{RepresentAllChildrenNodes()}</{Tag.HtmlTag}>";
     }
     public string? RepresentWithoutTags()
     {
@@ -29,10 +32,6 @@ public abstract class CompositeNode: INode
     public void Add(INode child)
     {
         _childrenNode.Add(child);
-    }
-    public void Remove(INode child)
-    {
-        _childrenNode.Remove(child);
     }
     public void ReplaceNode(CompositeNode current, INode replacement)
     {

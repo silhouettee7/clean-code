@@ -1,9 +1,9 @@
 ﻿
 
-using MarkdownProccesor.Tokens.Abstract;
-using MarkdownProccesor.Tokens.Types;
+using MarkdownProccesor.Nodes.Abstract;
+using MarkdownProccesor.Nodes.Types;
 
-namespace MarkdownProccesor.Tokens.Factories;
+namespace MarkdownProccesor.Nodes.Factories;
 
 public class BoldNodeFactory : CompositeNodeFactory
 {

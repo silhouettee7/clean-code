@@ -1,4 +1,4 @@
-﻿namespace MarkdownProccesor.Tokens;
+﻿namespace MarkdownProccesor.Nodes;
 
 public enum NodeType
 {
@@ -7,4 +7,5 @@ public enum NodeType
     Bold,
     Italic,
     Header,
+    Image
 }
