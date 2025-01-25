@@ -9,4 +9,5 @@ public class UserEntity
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
     public ICollection<DocumentEntity> Documents { get; set; } = new List<DocumentEntity>();
+    public ICollection<DocumentPermissionEntity> DocumentsPermissions { get; set; } = new List<DocumentPermissionEntity>();
 }
