@@ -12,7 +12,7 @@ public class MarkdownController(
     IMdService mdService, 
     ResponseResultCreator resultCreator): ControllerBase
 {
-    [HttpPost("convert")]
+    [HttpPost("/convert")]
     [Authorize]
     public async Task<IActionResult> ConvertMarkdown([FromBody] string markdown)
     {
