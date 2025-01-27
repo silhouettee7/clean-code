@@ -15,6 +15,7 @@ public static class ServicesCollectionExtensions
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IMdService, MdService>();
         services.AddScoped<IMinioService, MinioService>();
+        services.AddScoped<IDocumentService, DocumentService>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<IJwtWorker, JwtWorker>();
     }
@@ -22,6 +23,7 @@ public static class ServicesCollectionExtensions
     public static void AddAppRepositories(this IServiceCollection services)
     {
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IDocumentRepository, DocumentRepository>();
     }
     
     public static void AddApiAuthentication(
