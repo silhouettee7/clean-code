@@ -17,6 +17,7 @@ public class DocumentRepository(AppDbContext context): IDocumentRepository
         {
             var documentEntity = new DocumentEntity
             {
+                DocumentId = document.Id,
                 AuthorId = document.UserId,
                 AccessTypeId = (int)document.AccessType,
                 Title = document.Name
@@ -79,10 +80,14 @@ public class DocumentRepository(AppDbContext context): IDocumentRepository
         };
     }
 
-    public async Task<List<Document>> GetAllDocuments()
+    public async Task<List<Document>> GetAllDocuments(Guid userId)
     {
-        var documents = await context.Documents.ToListAsync();
-        return documents
+        var user = await context.Users
+            .Where(u => u.UserId == userId)
+            .Include(u => u.Documents)
+            .FirstAsync();
+            
+        return user.Documents
             .Select(d => new Document
             {
                 Name = d.Title,

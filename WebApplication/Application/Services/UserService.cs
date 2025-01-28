@@ -61,4 +61,24 @@ public class UserService(
         
         return Result<string>.Success(token);
     }
+
+    public async Task<Result> GetUserById(Guid userId)
+    {
+        var user = await userRepository.GetUserById(userId);
+        if (user == null)
+        {
+            return Result.Failure(new Error("User not found", ErrorType.NotFound));
+        }
+        return Result<User>.Success(user);
+    }
+
+    public async Task<Result> GetUserByEmail(string email)
+    {
+        var user = await userRepository.GetUserByEmail(email);
+        if (user == null)
+        {
+            return Result.Failure(new Error("User not found", ErrorType.NotFound));
+        }
+        return Result<User>.Success(user);
+    }
 }

@@ -38,4 +38,31 @@ public class JwtWorker(IOptions<JwtOptions> options): IJwtWorker
         }
     }
 
+    public (bool isSuccess, Guid userId) ValidateToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        var validationsParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidateLifetime = true,
+            ValidIssuer = options.Value.Issuer,
+            ValidAudience = options.Value.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.Value.Secret))
+        };
+        try
+        {
+            var claimsPrincipal = tokenHandler.ValidateToken(token, validationsParameters, out var validatedToken);
+            var userId = Guid.Parse(claimsPrincipal.Claims.First(x => x.Type == options.Value.UserId).Value);
+            return (true, userId);
+        }
+        catch (Exception ex)
+        {
+            return (false, default);
+        }
+        
+    }
+
 }

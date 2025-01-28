@@ -1,5 +1,6 @@
 using API.Extensions;
 using API.Utils;
+using Application.Services;
 using MarkdownProccesor;
 using Microsoft.AspNetCore.CookiePolicy;
 using Persistence;
@@ -24,6 +25,7 @@ builder.Services.AddDbContext<AppDbContext>(
     {
         options.UseNpgsql(configuration.GetConnectionString(nameof(AppDbContext)));
     });
+builder.Services.Configure<MinioOptions>(configuration.GetSection(nameof(MinioOptions)));
 
 builder.Services.AddScoped<ResponseResultCreator>();
 builder.Services.AddSingleton<MarkdownToHtmlProcessor>();
@@ -31,6 +33,7 @@ builder.Services.AddSingleton<MarkdownToHtmlProcessor>();
 builder.Services.AddApiAuthentication(configuration);
 builder.Services.AddAppServices();
 builder.Services.AddAppRepositories();
+builder.Services.AddFilters();
 
 var app = builder.Build();
 

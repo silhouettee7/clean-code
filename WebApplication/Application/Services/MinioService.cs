@@ -22,14 +22,18 @@ public class MinioService : IMinioService
         _bucketName = _options.BucketName;
     }
 
-    public async Task<bool> UploadFileAsync(string fileName)
+    public async Task<bool> UploadFileAsync(string fileName, Stream fileStream)
     {
         try
         {
             await EnsureBucketExistsAsync();
+            fileStream.Position = 0;
             await _client.PutObjectAsync(new PutObjectArgs()
                 .WithBucket(_bucketName)
-                .WithObject(fileName));
+                .WithObject(fileName)
+                .WithStreamData(fileStream)
+                .WithObjectSize(fileStream.Length)
+                .WithContentType("text/plain"));
             return true;
         }
         catch (Exception ex)
@@ -53,7 +57,7 @@ public class MinioService : IMinioService
         
         using var memoryStream = new MemoryStream();
         await memoryStream.WriteAsync(Encoding.UTF8.GetBytes(content));
-        
+        memoryStream.Seek(0, SeekOrigin.Begin);
         await _client.PutObjectAsync(
             new PutObjectArgs()
                 .WithBucket(_bucketName)

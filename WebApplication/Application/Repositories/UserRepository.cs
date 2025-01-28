@@ -53,4 +53,20 @@ public class UserRepository(AppDbContext context): IUserRepository
             PasswordHash = user.PasswordHash,
         };
     }
+
+    public async Task<User?> GetUserById(Guid id)
+    {
+        var userEntity = await context.Users
+            .AsNoTracking()
+            .Where(x => x.UserId == id)
+            .FirstOrDefaultAsync();
+        if (userEntity == null) return null;
+        return new User
+        {
+            Id = userEntity.UserId,
+            Email = userEntity.UserEmail,
+            Name = userEntity.UserName,
+            PasswordHash = userEntity.PasswordHash,
+        };
+    }
 }

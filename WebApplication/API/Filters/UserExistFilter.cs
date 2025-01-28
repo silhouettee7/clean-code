@@ -1,12 +1,35 @@
-using Application.Services;
+using Application.Abstract.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Guid = System.Guid;
 
 namespace API.Filters;
 
-public class UserExistFilter: IAsyncAuthorizationFilter
+public class UserExistFilter(IUserService userService): IAsyncAuthorizationFilter
 {
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
-        //context.HttpContext.User.FindFirst()
+        var useridClaim = context.HttpContext.User
+            .FindFirst(claim => claim.Type == "Sub");
+
+        Guid userId = Guid.Empty;
+        bool isValid = (useridClaim?.Value != null && 
+                        Guid.TryParse(useridClaim.Value, out userId) && 
+                        userId != Guid.Empty);
+        
+        if (!isValid)
+        {
+            context.Result = new ForbidResult();
+            return;
+        }
+
+        var result = await userService.GetUserById(userId);
+        if (result.IsOk == false)
+        {
+            context.Result = new ForbidResult();
+            return;
+        }
+        
+        context.HttpContext.Items["UserId"] = userId;
     }
 }

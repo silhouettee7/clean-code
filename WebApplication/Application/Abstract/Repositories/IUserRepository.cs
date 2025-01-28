@@ -8,4 +8,5 @@ public interface IUserRepository
     Task<bool> UpdateUser(User user);
     Task<bool> DeleteUserById(Guid userId);
     Task<User?> GetUserByEmail(string email);
+    Task<User?> GetUserById(Guid id);
 }

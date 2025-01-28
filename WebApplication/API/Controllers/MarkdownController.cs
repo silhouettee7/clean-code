@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("md/[controller]")]
 public class MarkdownController(
@@ -13,7 +14,6 @@ public class MarkdownController(
     ResponseResultCreator resultCreator): ControllerBase
 {
     [HttpPost("/convert")]
-    [Authorize]
     public async Task<IActionResult> ConvertMarkdown([FromBody] string markdown)
     {
         var result = await mdService.GetHtml(markdown);

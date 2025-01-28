@@ -1,3 +1,4 @@
+using System.Text;
 using Application.Abstract.Repositories;
 using Application.Abstract.Services;
 using Application.ResponseResult;
@@ -26,7 +27,9 @@ public class DocumentService(
         }
         
         string fileName = $"{createdDocument.Id}.txt";
-        var isFileUpload = await minioService.UploadFileAsync(fileName);
+        using var stream = new MemoryStream();
+        await stream.WriteAsync(Encoding.UTF8.GetBytes("document"));
+        var isFileUpload = await minioService.UploadFileAsync(fileName, stream);
 
         if (!isFileUpload)
         {
@@ -95,7 +98,7 @@ public class DocumentService(
 
     public async Task<Result> GetAllDocuments(Guid userId)
     {
-        var documents = await documentRepository.GetAllDocuments();
+        var documents = await documentRepository.GetAllDocuments(userId);
         return Result<List<Document>>.Success(documents);
     }
 }

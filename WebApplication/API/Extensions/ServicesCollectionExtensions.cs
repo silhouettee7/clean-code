@@ -1,4 +1,5 @@
 using System.Text;
+using API.Filters;
 using Application.Abstract.Repositories;
 using Application.Abstract.Services;
 using Application.Repositories;
@@ -16,6 +17,7 @@ public static class ServicesCollectionExtensions
         services.AddScoped<IMdService, MdService>();
         services.AddScoped<IMinioService, MinioService>();
         services.AddScoped<IDocumentService, DocumentService>();
+        services.AddScoped<IDocumentAccessService, DocumentAccessService>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<IJwtWorker, JwtWorker>();
     }
@@ -24,8 +26,17 @@ public static class ServicesCollectionExtensions
     {
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IDocumentRepository, DocumentRepository>();
+        services.AddScoped<IDocumentPermissionRepository, DocumentPermissionRepository>();
     }
-    
+
+    public static void AddFilters(this IServiceCollection services)
+    {
+        services.AddScoped<DocumentAccessFilter>();
+        services.AddScoped<DocumentReadFilter>();
+        services.AddScoped<DocumentEditFilter>();
+        services.AddScoped<UserExistFilter>();
+        services.AddScoped<DocumentExistFilter>();
+    }
     public static void AddApiAuthentication(
         this IServiceCollection services,
         IConfiguration configuration)
