@@ -36,6 +36,8 @@ public static class ServicesCollectionExtensions
         services.AddScoped<DocumentEditFilter>();
         services.AddScoped<UserExistFilter>();
         services.AddScoped<DocumentExistFilter>();
+        services.AddScoped<UserRegisterValidateFilter>();
+        services.AddScoped<UserLoginEmailValidateFilter>();
     }
     public static void AddApiAuthentication(
         this IServiceCollection services,

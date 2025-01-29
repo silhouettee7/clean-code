@@ -1,8 +1,8 @@
 using API.DTO;
+using API.Filters;
 using API.Utils;
 using Application.Abstract.Services;
 using Application.ResponseResult;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -14,6 +14,7 @@ public class UserController(
     IUserService userService,
     ResponseResultCreator resultCreator): ControllerBase
 {
+    [ServiceFilter(typeof(UserRegisterValidateFilter))]
     [HttpPost("/signup")]
     public async Task<IActionResult> Register([FromBody] UserRegister userRegister)
     {
@@ -28,7 +29,8 @@ public class UserController(
 
         return Ok();
     }
-
+    
+    [ServiceFilter(typeof(UserLoginEmailValidateFilter))]
     [HttpPost("/login/email")]
     public async Task<IActionResult> LoginByEmail([FromBody] UserLoginEmail userLoginEmail)
     {
