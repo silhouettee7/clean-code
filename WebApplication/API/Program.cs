@@ -1,4 +1,5 @@
 using API.Extensions;
+using API.Middlewares;
 using API.Utils;
 using Application.Services;
 using MarkdownProccesor;
@@ -50,6 +51,7 @@ app.UseCookiePolicy(new CookiePolicyOptions
     Secure = CookieSecurePolicy.Always
 });
 
+app.UseMiddleware<LoggingMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
