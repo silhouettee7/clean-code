@@ -4,14 +4,17 @@ let currentDocumentId = null;
 const documentList = document.getElementById('documentList');
 const createDocumentBtn = document.getElementById('createDocumentBtn');
 const documentModal = document.getElementById('documentModal');
+const userModal = document.getElementById('userModal');
 const closeModal = document.querySelector('.close');
 const documentNameInput = document.getElementById('documentName');
 const documentAccessInput = document.getElementById('documentAccess');
 const modalTitle = document.getElementById('modalTitle');
 const submitDocumentBtn = document.getElementById('submitDocumentBtn');
-
+const userEmailInput = document.getElementById('userEmail');
+const userAccessInput = document.getElementById('userAccess');
+const submitUserBtn = document.getElementById('submitUserBtn');
 document.addEventListener('DOMContentLoaded', loadDocuments);
-
+submitUserBtn.addEventListener('click',e => provideAccess(e));
 // Открытие модального окна для создания документа
 createDocumentBtn.addEventListener('click', () => {
     currentDocumentId = null;
@@ -25,6 +28,7 @@ createDocumentBtn.addEventListener('click', () => {
 // Закрытие модального окна
 closeModal.addEventListener('click', () => {
     documentModal.style.display = 'none';
+    userModal.style.display = 'none';
 });
 
 // Закрытие модального окна при клике вне его
@@ -56,6 +60,19 @@ submitDocumentBtn.addEventListener('click', async (event) => {
     documentModal.style.display = 'none';
 });
 
+async function provideAccess(event) {
+    const email = userEmailInput.value;
+    const access = parseInt(userAccessInput.value);
+    const response = await fetch(`api/document/provide/${currentDocumentId}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email: email, accessLevel: access}),
+    })
+    if (response.ok) {
+        console.log("success provide");
+    }
+    userModal.style.display = 'none';
+}
 // Рендеринг списка документов
 async function renderDocuments() {
     documentList.innerHTML = '';
@@ -68,10 +85,17 @@ async function renderDocuments() {
         documentEditBtn.textContent = 'Edit';
         const documentDeleteBtn = document.createElement('button');
         documentDeleteBtn.textContent = 'Delete';
+        const permissionBtn = document.createElement('button');
+        permissionBtn.textContent = 'Access';
+        permissionBtn.addEventListener('click', (e) => {
+            currentDocumentId = parseInt(e.currentTarget.parentElement.id);
+            userModal.style.display = 'flex';
+        })
         li.id = doc.id;
         li.appendChild(a);
         li.appendChild(documentEditBtn);
         li.appendChild(documentDeleteBtn);
+        li.appendChild(permissionBtn);
         documentList.appendChild(li);
         documentEditBtn.addEventListener('click', (event) => {
             const id = event.currentTarget.parentElement.id;

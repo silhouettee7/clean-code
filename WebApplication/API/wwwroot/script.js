@@ -68,5 +68,6 @@ document.getElementById('loginForm').addEventListener('click', (event) => {
         .then(() => {
             document.getElementById('loginModal').style.display = 'none';
         })
+        .then(() => window.location.href='home')
         .catch(error => console.error('Error:', error));
 });

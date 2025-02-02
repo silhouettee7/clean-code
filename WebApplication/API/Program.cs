@@ -45,6 +45,20 @@ var app = builder.Build();
     app.UseSwaggerUI();
 }*/
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<AppDbContext>();
+        context.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Ошибка при применении миграций.");
+    }
+}
 
 app.UseCookiePolicy(new CookiePolicyOptions
 {
