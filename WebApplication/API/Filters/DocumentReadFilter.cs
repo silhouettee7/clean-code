@@ -11,15 +11,17 @@ public class DocumentReadFilter(IDocumentAccessService accessService): IAsyncAct
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var document = context.HttpContext.Items["Document"] as Document;
+        if(document == null) return;
         if (context.HttpContext.Items["UserId"] == null)
         {
-            if (document.AccessType == AccessType.PublicRead)
+            if (document.AccessType == AccessType.PublicRead || 
+                document.AccessType == AccessType.PublicEdit)
             {
                 await next();
             }
             else
             {
-                context.Result = new UnauthorizedResult();
+                context.Result = new ForbidResult("You are not authorized to access document");;
             }
             return;
         }
@@ -30,7 +32,7 @@ public class DocumentReadFilter(IDocumentAccessService accessService): IAsyncAct
 
         if (!isAccessProvided)
         {
-            context.Result = new UnauthorizedResult();
+            context.Result = new ForbidResult("You are not authorized to access document");;
             return;
         }
 

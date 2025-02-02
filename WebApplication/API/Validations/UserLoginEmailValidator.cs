@@ -9,9 +9,9 @@ public class UserLoginEmailValidator: AbstractValidator<UserLoginEmail>
     {
         RuleFor(userLogin => userLogin.Password)
             .NotEmpty().WithMessage("Password is not required")
-            .MinimumLength(8)
-            .MaximumLength(50).WithMessage("Password must be between 8 and 50 characters")
-            .Matches(@"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]$")
+            .MinimumLength(8).WithMessage("Password must be at least 8 characters")
+            .MaximumLength(50).WithMessage("Password must be max 50 characters")
+            .Matches(@"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,50}$")
             .WithMessage("Password must be at least one digit, special symbol, and upper case letter.");
 
         RuleFor(userLogin => userLogin.UserEmail)

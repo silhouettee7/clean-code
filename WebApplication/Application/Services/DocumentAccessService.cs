@@ -50,6 +50,11 @@ public class DocumentAccessService(
     public async Task<Result> CreateDocumentPermission(
         Guid userId, Guid documentId, AccessLevel accessLevel)
     {
+        var documentPermissionExist = await permissionRepository.GetDocumentPermission(userId, documentId);
+        if (documentPermissionExist != null)
+        {
+            return Result.Failure(new Error("Document permission already exist", ErrorType.BadRequest));
+        }
         var isCreated = await permissionRepository
             .CreateDocumentPermission(documentId, userId, accessLevel);
         if (!isCreated)
@@ -57,6 +62,22 @@ public class DocumentAccessService(
             return Result.Failure(new Error(
                 "Can't create document permission", 
                 ErrorType.ServerError));
+        }
+        return Result.Success();
+    }
+
+    public async Task<Result> UpdateDocumentPermission(Guid userId, Guid documentId, AccessLevel accessLevel)
+    {
+        var documentPermissionExist = await permissionRepository.GetDocumentPermission(userId, documentId);
+        if (documentPermissionExist == null)
+        {
+            return Result.Failure(new Error("Document permission not found", ErrorType.NotFound));
+        }
+        documentPermissionExist.AccessLevel = accessLevel;
+        var isUpdated = await permissionRepository.UpdateDocumentPermission(documentId, userId, accessLevel);
+        if (!isUpdated)
+        {
+            return Result.Failure(new Error("Can't update document permission", ErrorType.ServerError));
         }
         return Result.Success();
     }

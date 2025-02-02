@@ -1,5 +1,6 @@
 using System.Text;
 using API.Filters;
+using API.Validations;
 using Application.Abstract.Repositories;
 using Application.Abstract.Services;
 using Application.Repositories;
@@ -38,6 +39,12 @@ public static class ServicesCollectionExtensions
         services.AddScoped<DocumentExistFilter>();
         services.AddScoped<UserRegisterValidateFilter>();
         services.AddScoped<UserLoginEmailValidateFilter>();
+    }
+
+    public static void AddValidators(this IServiceCollection services)
+    {
+        services.AddScoped<UserLoginEmailValidator>();
+        services.AddScoped<UserRegisterValidator>();
     }
     public static void AddApiAuthentication(
         this IServiceCollection services,

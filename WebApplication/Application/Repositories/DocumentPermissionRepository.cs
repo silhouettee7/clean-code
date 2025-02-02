@@ -29,6 +29,11 @@ public class DocumentPermissionRepository(AppDbContext context): IDocumentPermis
         }
     }
 
+    public async Task<bool> UpdateDocumentPermission(Guid documentId, Guid userId, AccessLevel accessLevel)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<DocumentPermission?> GetDocumentPermission(Guid userId, Guid documentId)
     {
         var permissionEntity = context.Permissions.FirstOrDefault(p => p.DocumentId == documentId && p.UserId == userId);

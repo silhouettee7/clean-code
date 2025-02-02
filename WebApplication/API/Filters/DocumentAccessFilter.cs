@@ -19,7 +19,7 @@ public class DocumentAccessFilter(
             var token = context.HttpContext.Request.Cookies["simply-cookies"];
             if (string.IsNullOrEmpty(token))
             {
-                context.Result = new UnauthorizedResult();
+                context.Result = new UnauthorizedObjectResult("token is empty");
                 return;
             }
             var validateTokenResult = worker.ValidateToken(token);
@@ -30,7 +30,7 @@ public class DocumentAccessFilter(
             }
             else
             {
-                context.Result = new UnauthorizedResult();
+                context.Result = new UnauthorizedObjectResult("token is invalid");
             }
 
             return;

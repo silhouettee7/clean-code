@@ -19,14 +19,14 @@ public class UserExistFilter(IUserService userService): IAsyncAuthorizationFilte
         
         if (!isValid)
         {
-            context.Result = new ForbidResult();
+            context.Result = new BadRequestObjectResult("Invalid user id");
             return;
         }
 
         var result = await userService.GetUserById(userId);
         if (result.IsOk == false)
         {
-            context.Result = new ForbidResult();
+            context.Result = new NotFoundObjectResult("User not found");
             return;
         }
         

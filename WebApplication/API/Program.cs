@@ -34,7 +34,9 @@ builder.Services.AddSingleton<MarkdownToHtmlProcessor>();
 builder.Services.AddApiAuthentication(configuration);
 builder.Services.AddAppServices();
 builder.Services.AddAppRepositories();
+builder.Services.AddValidators();
 builder.Services.AddFilters();
+
 
 var app = builder.Build();
 

@@ -6,11 +6,12 @@ public class LoggingMiddleware(RequestDelegate next, ILogger<LoggingMiddleware> 
 {
     public async Task InvokeAsync(HttpContext httpContext)
     {
+        httpContext.Request.EnableBuffering();
         using var streamReader = new StreamReader(httpContext.Request.Body);
         var body = await streamReader.ReadToEndAsync();
-        
+        httpContext.Request.Body.Position = 0;
         var headers = httpContext.Request.Headers
-            .Select(x => $"{x.Key}: {string.Join(", ", x.Value)}");
+            .Select(x => $"{x.Key}: {string.Join(", ", x.Value.ToString())}");
         
         var requestAbout = $"Id: {httpContext.Connection.Id}\n" +
                            $"Method: {httpContext.Request.Method}\n" +
@@ -21,12 +22,9 @@ public class LoggingMiddleware(RequestDelegate next, ILogger<LoggingMiddleware> 
             
         await next(httpContext);
         
-        using var streamWriter = new StreamWriter(httpContext.Response.Body);
-        var responseBody = await streamReader.ReadToEndAsync();
         
         var responseAbout = $"Id: {httpContext.Connection.Id}\n" +
-                            $"Status code: {httpContext.Response.StatusCode}\n " +
-                            $"Body: {responseBody}";
+                            $"Status code: {httpContext.Response.StatusCode}\n ";
         logger.LogInformation(responseAbout);
     }
 }

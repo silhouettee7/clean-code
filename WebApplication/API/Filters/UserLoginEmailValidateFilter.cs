@@ -12,7 +12,7 @@ public class UserLoginEmailValidateFilter(UserLoginEmailValidator validator): IA
         var userLogin = context.ActionArguments["userLoginEmail"] as UserLoginEmail;
         if (userLogin == null)
         {
-            context.Result = new BadRequestResult();
+            context.Result = new BadRequestObjectResult("Please provide valid user login email");
         }
         var result = validator.Validate(userLogin!);
         if (!result.IsValid)

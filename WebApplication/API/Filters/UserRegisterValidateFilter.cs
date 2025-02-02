@@ -12,7 +12,7 @@ public class UserRegisterValidateFilter(UserRegisterValidator validator): IActio
         var userRegister = context.ActionArguments["userRegister"] as UserRegister;
         if (userRegister == null)
         {
-            context.Result = new BadRequestResult();
+            context.Result = new BadRequestObjectResult("UserRegister is not required");
         }
         var result = validator.Validate(userRegister!);
         if (!result.IsValid)
