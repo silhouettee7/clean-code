@@ -1,6 +1,7 @@
 using Application.Abstract.Repositories;
 using Domain.Enums;
 using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Persistence.Entities;
 
@@ -36,7 +37,8 @@ public class DocumentPermissionRepository(AppDbContext context): IDocumentPermis
 
     public async Task<DocumentPermission?> GetDocumentPermission(Guid userId, Guid documentId)
     {
-        var permissionEntity = context.Permissions.FirstOrDefault(p => p.DocumentId == documentId && p.UserId == userId);
+        var permissionEntity = await context.Permissions
+            .FirstOrDefaultAsync(p => p.DocumentId == documentId && p.UserId == userId);
         if (permissionEntity == null)
         {
             return null;

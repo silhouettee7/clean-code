@@ -1,3 +1,4 @@
+using API.DTO;
 using API.Utils;
 using Application.Abstract.Services;
 using Application.ResponseResult;
@@ -6,17 +7,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-[Authorize]
 [ApiController]
-[Route("md/[controller]")]
+[Route("md")]
 public class MarkdownController(
     IMdService mdService, 
     ResponseResultCreator resultCreator): ControllerBase
 {
-    [HttpPost("/convert")]
-    public async Task<IActionResult> ConvertMarkdown([FromBody] string markdown)
+    [HttpPost("convert")]
+    public async Task<IActionResult> ConvertMarkdown([FromBody] MarkdownContent markdown)
     {
-        var result = await mdService.GetHtml(markdown);
+        var result = await mdService.GetHtml(markdown.Text);
 
         if (!result.IsOk)
         {

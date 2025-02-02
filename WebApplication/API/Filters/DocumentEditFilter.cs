@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace API.Filters;
 
-public class DocumentEditFilter(IDocumentAccessService accessService): IAsyncActionFilter
+public class DocumentEditFilter(IDocumentAccessService accessService, IJwtWorker worker): IAsyncActionFilter
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
@@ -14,7 +14,7 @@ public class DocumentEditFilter(IDocumentAccessService accessService): IAsyncAct
         if (document == null) return;
         if (context.HttpContext.Items["UserId"] == null)
         {
-            if (document.AccessType == AccessType.PublicEdit)
+            if (document.AccessType == AccessType.PublicEdit || TryAuthorize(context))
             {
                 await next();
             }
@@ -37,5 +37,21 @@ public class DocumentEditFilter(IDocumentAccessService accessService): IAsyncAct
         }
 
         await next();
+    }
+
+    private bool TryAuthorize(ActionExecutingContext context)
+    {
+        var token = context.HttpContext.Request.Cookies["simply-cookies"];
+        if (string.IsNullOrEmpty(token))
+        {
+            return false;
+        }
+        var validateTokenResult = worker.ValidateToken(token);
+        if (validateTokenResult.isSuccess)
+        {
+            return true;
+        }
+
+        return false;
     }
 }

@@ -20,7 +20,7 @@ public class DocumentRepository(AppDbContext context): IDocumentRepository
                 DocumentId = document.Id,
                 AuthorId = document.UserId,
                 AccessTypeId = (int)document.AccessType,
-                Title = document.Name
+                Title = document.Title
             };
             await context.Documents.AddAsync(documentEntity);
             await context.SaveChangesAsync();
@@ -42,7 +42,7 @@ public class DocumentRepository(AppDbContext context): IDocumentRepository
         }
         
         documentEntity.AuthorId = document.UserId;
-        documentEntity.Title = document.Name;
+        documentEntity.Title = document.Title;
         documentEntity.AccessTypeId = (int)document.AccessType;
         
         context.Documents.Update(documentEntity);
@@ -75,7 +75,7 @@ public class DocumentRepository(AppDbContext context): IDocumentRepository
         {
             Id = document.DocumentId,
             AccessType = (AccessType)document.AccessTypeId,
-            Name = document.Title,
+            Title = document.Title,
             UserId = document.AuthorId
         };
     }
@@ -90,7 +90,7 @@ public class DocumentRepository(AppDbContext context): IDocumentRepository
         return user.Documents
             .Select(d => new Document
             {
-                Name = d.Title,
+                Title = d.Title,
                 Id = d.DocumentId,
                 UserId = d.AuthorId,
                 AccessType = (AccessType)d.AccessTypeId

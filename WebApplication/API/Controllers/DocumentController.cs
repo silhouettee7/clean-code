@@ -12,14 +12,14 @@ namespace API.Controllers;
 [Authorize]
 [ServiceFilter(typeof(UserExistFilter))]
 [ApiController]
-[Route("document/[controller]")]
+[Route("api/document")]
 public class DocumentController(
     IDocumentService documentService,
     IUserService userService,
     IDocumentAccessService documentAccessService,
     ResponseResultCreator creator): ControllerBase
 {
-    [HttpPost("/create")]
+    [HttpPost("create")]
     public async Task<IActionResult> CreateDocument([FromBody] UserDocument documentResponse)
     {
         var userId = Guid.Parse(HttpContext.Items["UserId"].ToString());
@@ -36,7 +36,7 @@ public class DocumentController(
         return Ok(document);
     }
     
-    [HttpPatch("/update/{documentId:guid}")]
+    [HttpPatch("update/{documentId:guid}")]
     public async Task<IActionResult> UpdateDocument(Guid documentId, [FromBody] UserDocument documentResponse)
     {
         var userId = Guid.Parse(HttpContext.Items["UserId"].ToString());
@@ -53,7 +53,7 @@ public class DocumentController(
         return Ok();
     }
 
-    [HttpDelete("/delete/{documentId:guid}")]
+    [HttpDelete("delete/{documentId:guid}")]
     public async Task<IActionResult> DeleteDocument(Guid documentId)
     {
         var result = await documentService.DeleteDocumentById(documentId);
@@ -65,7 +65,7 @@ public class DocumentController(
         return Ok();
     }
 
-    [HttpGet("/all")]
+    [HttpGet("all")]
     public async Task<IActionResult> GetAllDocuments()
     {
         var userId = Guid.Parse(HttpContext.Items["UserId"].ToString());
@@ -82,7 +82,7 @@ public class DocumentController(
         return Ok(documents);
     }
 
-    [HttpPost("/provide/{documentId:guid}")]
+    [HttpPost("provide/{documentId:guid}")]
     public async Task<IActionResult> ProvideDocument(Guid documentId, 
         [FromBody] UserDocumentProvide documentProvide)
     {

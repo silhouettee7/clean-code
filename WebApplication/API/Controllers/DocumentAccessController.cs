@@ -1,3 +1,4 @@
+using API.DTO;
 using API.Filters;
 using API.Utils;
 using Application.Abstract.Services;
@@ -9,13 +10,13 @@ namespace API.Controllers;
 [ServiceFilter(typeof(DocumentExistFilter))]
 [ServiceFilter(typeof(DocumentAccessFilter))]
 [ApiController]
-[Route("document/access[controller]")]
+[Route("document/access")]
 public class DocumentAccessController(
     IDocumentService documentService,
     ResponseResultCreator creator): ControllerBase
 {
     [ServiceFilter(typeof(DocumentReadFilter))]
-    [HttpGet("/{documentId:guid}")]
+    [HttpGet("{documentId:guid}")]
     public async Task<IActionResult> GetDocumentContent(Guid documentId)
     {
         var result = await documentService.GetDocumentContentById(documentId);
@@ -32,10 +33,10 @@ public class DocumentAccessController(
     }
     
     [ServiceFilter(typeof(DocumentEditFilter))]
-    [HttpPatch("public/update/{documentId:guid}")]
-    public async Task<IActionResult> UpdateDocumentContent([FromBody] string content, Guid documentId)
+    [HttpPatch("update/{documentId:guid}")]
+    public async Task<IActionResult> UpdateDocumentContent([FromBody] MarkdownContent content, Guid documentId)
     {
-        var result = await documentService.UpdateDocumentContent(documentId, content);
+        var result = await documentService.UpdateDocumentContent(documentId, content.Text);
         if (!result.IsOk)
         {
             return creator.CreateAction(result);

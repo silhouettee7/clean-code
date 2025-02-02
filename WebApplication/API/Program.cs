@@ -20,7 +20,7 @@ var configuration = builder.Configuration;
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(
     options =>
     {
@@ -37,14 +37,14 @@ builder.Services.AddAppRepositories();
 builder.Services.AddValidators();
 builder.Services.AddFilters();
 
-
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+/*if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+}*/
+
 
 app.UseCookiePolicy(new CookiePolicyOptions
 {
@@ -55,6 +55,7 @@ app.UseCookiePolicy(new CookiePolicyOptions
 
 app.UseMiddleware<LoggingMiddleware>();
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

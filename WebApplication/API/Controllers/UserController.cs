@@ -9,13 +9,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/user")]
 public class UserController(
     IUserService userService,
     ResponseResultCreator resultCreator): ControllerBase
 {
     [ServiceFilter(typeof(UserRegisterValidateFilter))]
-    [HttpPost("/signup")]
+    [HttpPost("signup")]
     public async Task<IActionResult> Register([FromBody] UserRegister userRegister)
     {
         var result = await userService.AddUser(userRegister.UserName,
@@ -31,7 +31,7 @@ public class UserController(
     }
     
     [ServiceFilter(typeof(UserLoginEmailValidateFilter))]
-    [HttpPost("/login/email")]
+    [HttpPost("login/email")]
     public async Task<IActionResult> LoginByEmail([FromBody] UserLoginEmail userLoginEmail)
     {
         var result = await userService.AuthenticateUserByEmail(

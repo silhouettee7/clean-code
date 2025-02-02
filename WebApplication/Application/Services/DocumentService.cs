@@ -16,7 +16,7 @@ public class DocumentService(
         var document = new Document
         {
             Id = Guid.NewGuid(),
-            Name = name,
+            Title = name,
             AccessType = accessType,
             UserId = userId
         };
@@ -46,7 +46,7 @@ public class DocumentService(
             Id = documentId,
             UserId = userId,
             AccessType = accessType,
-            Name = name
+            Title = name
         };
         var isDocumentUpdated = await documentRepository.UpdateDocument(document);
         if (!isDocumentUpdated)
