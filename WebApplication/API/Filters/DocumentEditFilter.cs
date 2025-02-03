@@ -11,47 +11,26 @@ public class DocumentEditFilter(IDocumentAccessService accessService, IJwtWorker
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var document = context.HttpContext.Items["Document"] as Document;
-        if (document == null) return;
-        if (context.HttpContext.Items["UserId"] == null)
+        if (context.HttpContext.Items["UserId"] != null)
         {
-            if (document.AccessType == AccessType.PublicEdit || TryAuthorize(context))
+            var userId = Guid.Parse(context.HttpContext.Items["UserId"]!.ToString());
+        
+            var isAccessProvided = await accessService
+                .TryProvideAccessEditToUser(userId, document!.Id);
+
+            if (isAccessProvided)
             {
                 await next();
+                return;
             }
-            else
-            {
-                context.Result = new ForbidResult();
-            }
-            
-            return;
         }
-        var userId = Guid.Parse(context.HttpContext.Items["UserId"].ToString());
-        
-        var isAccessProvided = await accessService
-            .TryProvideAccessEditToUser(userId, document.Id);
-
-        if (!isAccessProvided)
+        if (document!.AccessType == AccessType.PublicEdit)
+        {
+            await next();
+        }
+        else
         {
             context.Result = new ForbidResult();
-            return;
         }
-
-        await next();
-    }
-
-    private bool TryAuthorize(ActionExecutingContext context)
-    {
-        var token = context.HttpContext.Request.Cookies["simply-cookies"];
-        if (string.IsNullOrEmpty(token))
-        {
-            return false;
-        }
-        var validateTokenResult = worker.ValidateToken(token);
-        if (validateTokenResult.isSuccess)
-        {
-            return true;
-        }
-
-        return false;
     }
 }
