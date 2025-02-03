@@ -72,6 +72,7 @@ async function provideAccess(event) {
         console.log("success provide");
     }
     userModal.style.display = 'none';
+    currentDocumentId = null;
 }
 // Рендеринг списка документов
 async function renderDocuments() {
@@ -88,7 +89,7 @@ async function renderDocuments() {
         const permissionBtn = document.createElement('button');
         permissionBtn.textContent = 'Access';
         permissionBtn.addEventListener('click', (e) => {
-            currentDocumentId = parseInt(e.currentTarget.parentElement.id);
+            currentDocumentId = e.currentTarget.parentElement.id;
             userModal.style.display = 'flex';
         })
         li.id = doc.id;

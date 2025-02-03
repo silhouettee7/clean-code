@@ -13,6 +13,11 @@ public class DocumentPermissionRepository(AppDbContext context): IDocumentPermis
     {
         try
         {
+            var doc = await GetDocumentPermission(userId, documentId);
+            if (doc != null)
+            {
+                return false;
+            }
             var permissionEntity = new DocumentPermissionEntity
             {
                 AccessLevelId = (int)accessLevel,
