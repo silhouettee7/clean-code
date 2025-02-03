@@ -9,18 +9,15 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-builder.Configuration
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
+
+builder.Configuration.AddEnvironmentVariables();
 
 var configuration = builder.Configuration;
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
+
+builder.Services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
 builder.Services.AddDbContext<AppDbContext>(
     options =>
     {
@@ -31,7 +28,7 @@ builder.Services.Configure<MinioOptions>(configuration.GetSection(nameof(MinioOp
 builder.Services.AddScoped<ResponseResultCreator>();
 builder.Services.AddSingleton<MarkdownToHtmlProcessor>();
 
-builder.Services.AddApiAuthentication(configuration);
+builder.Services.AddApiAuthentication(configuration.GetSection(nameof(JwtOptions)).Get<JwtOptions>());
 builder.Services.AddAppServices();
 builder.Services.AddAppRepositories();
 builder.Services.AddValidators();
@@ -45,7 +42,7 @@ var app = builder.Build();
     app.UseSwaggerUI();
 }*/
 
-/*using (var scope = app.Services.CreateScope())
+using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
@@ -58,7 +55,8 @@ var app = builder.Build();
         var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "Ошибка при применении миграций.");
     }
-}*/
+}
+
 
 app.UseCookiePolicy(new CookiePolicyOptions
 {

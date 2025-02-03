@@ -6,6 +6,7 @@ using Application.Abstract.Services;
 using Application.Repositories;
 using Application.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace API.Extensions;
@@ -48,10 +49,8 @@ public static class ServicesCollectionExtensions
     }
     public static void AddApiAuthentication(
         this IServiceCollection services,
-        IConfiguration configuration)
+        JwtOptions jwtOptions)
     {
-        services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
-        var jwtOptions = configuration.GetSection(nameof(JwtOptions)).Get<JwtOptions>();
         if (jwtOptions == null)
         {
             throw new ApplicationException("JWT is not configured");
