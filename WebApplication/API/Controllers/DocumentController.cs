@@ -14,11 +14,13 @@ namespace API.Controllers;
 [ApiController]
 [Route("api/document")]
 public class DocumentController(
+    IMinioService minioService,
     IDocumentService documentService,
     IUserService userService,
     IDocumentAccessService documentAccessService,
     ResponseResultCreator creator): ControllerBase
 {
+    
     [HttpPost("create")]
     public async Task<IActionResult> CreateDocument([FromBody] UserDocument documentResponse)
     {
@@ -52,7 +54,7 @@ public class DocumentController(
         
         return Ok();
     }
-
+    
     [HttpDelete("delete/{documentId:guid}")]
     public async Task<IActionResult> DeleteDocument(Guid documentId)
     {
@@ -64,7 +66,7 @@ public class DocumentController(
 
         return Ok();
     }
-
+    
     [HttpGet("all")]
     public async Task<IActionResult> GetAllDocuments()
     {
@@ -81,7 +83,7 @@ public class DocumentController(
         }
         return Ok(documents);
     }
-
+    
     [HttpPost("provide/{documentId:guid}")]
     public async Task<IActionResult> ProvideDocument(Guid documentId, 
         [FromBody] UserDocumentProvide documentProvide)
@@ -102,5 +104,12 @@ public class DocumentController(
             return creator.CreateAction(resultResponse);
         }
         return Ok();
+    }
+    
+    [HttpGet("url/{documentId:guid}")]
+    public async Task<IActionResult> GetDocumentUrl(Guid documentId)
+    {
+        var result = await minioService.GetDownloadFileAsync($"{documentId}.txt");
+        return File(result, "text/plain", $"{documentId}.txt");
     }
 }

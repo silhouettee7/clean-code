@@ -111,6 +111,29 @@ public class MinioService : IMinioService
                 .WithObject(fileName));
         return true;
     }
+
+    public async Task<byte[]> GetDownloadFileAsync(string fileName)
+    {
+        var obj = await _client.StatObjectAsync(
+            new StatObjectArgs()
+                .WithBucket(_bucketName)
+                .WithObject(fileName));
+
+        if (obj is null)
+        {
+            return new byte[0];
+        }
+        
+        using MemoryStream memoryStream = new MemoryStream();
+        await _client.GetObjectAsync(
+                new GetObjectArgs()
+                    .WithBucket(_bucketName)
+                    .WithObject(fileName)
+                    .WithCallbackStream(stream => stream.CopyTo(memoryStream)));
+        
+        return memoryStream.ToArray();
+    }
+
     private async Task EnsureBucketExistsAsync()
     {
         bool isFound = await _client.BucketExistsAsync(new BucketExistsArgs().WithBucket(_bucketName));

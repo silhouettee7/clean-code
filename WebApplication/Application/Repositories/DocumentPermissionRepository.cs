@@ -40,6 +40,18 @@ public class DocumentPermissionRepository(AppDbContext context): IDocumentPermis
         throw new NotImplementedException();
     }
 
+    public async Task<bool> DeleteDocumentPermission(Guid documentId, Guid userId)
+    {
+        var permission = await context.Permissions.FirstOrDefaultAsync(p => p.DocumentId == documentId && p.UserId == userId);
+        if (permission != null)
+        {
+            context.Permissions.Remove(permission);
+            await context.SaveChangesAsync();
+            return true;
+        }
+        return false;
+    }
+
     public async Task<DocumentPermission?> GetDocumentPermission(Guid userId, Guid documentId)
     {
         var permissionEntity = await context.Permissions
@@ -56,6 +68,27 @@ public class DocumentPermissionRepository(AppDbContext context): IDocumentPermis
             AccessLevel = (AccessLevel)permissionEntity.AccessLevelId,
         };
     }
-    
-    
+
+    public async Task<DocumentAccessLevelProvide?> GetPermissionsProvides(Guid documentId)
+    {
+        var doc = await context.Documents.Where(d => d.DocumentId == documentId)
+            .Include(d => d.Permissions)
+            .ThenInclude(documentPermissionEntity => documentPermissionEntity.User)
+            .FirstOrDefaultAsync();
+        if (doc == null)
+        {
+            return null;
+        }
+
+        return new DocumentAccessLevelProvide
+        {
+            DocumentId = doc.DocumentId,
+            Provides = doc.Permissions.Select(p => new AccessLevelProvide
+            {
+                Email = p.User.UserEmail,
+                Level = (AccessLevel)p.AccessLevelId
+            }).ToList()
+        };
+
+    }
 }

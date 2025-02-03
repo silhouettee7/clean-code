@@ -3,12 +3,14 @@ using Application.Abstract.Services;
 using Application.Repositories;
 using Application.ResponseResult;
 using Domain.Enums;
+using Domain.Models;
 
 namespace Application.Services;
 
 public class DocumentAccessService(
     IDocumentPermissionRepository permissionRepository,
-    IDocumentRepository documentRepository): IDocumentAccessService
+    IDocumentRepository documentRepository,
+    IUserRepository userRepository): IDocumentAccessService
 {
     public async Task<bool> TryProvideAccessEditToUser(Guid userId, Guid documentId)
     {
@@ -80,5 +82,31 @@ public class DocumentAccessService(
             return Result.Failure(new Error("Can't update document permission", ErrorType.ServerError));
         }
         return Result.Success();
+    }
+
+    public async Task<Result> GetDocumentAccessLevelProvides(Guid documentId)
+    {
+        var result = await permissionRepository.GetPermissionsProvides(documentId);
+        if (result == null)
+        {
+            return Result.Failure(new Error("Can't get document permissions", ErrorType.NotFound));
+        }
+        return Result<DocumentAccessLevelProvide>.Success(result);
+    }
+
+    public async Task<Result> DeleteDocumentPermission(string email, Guid documentId)
+    {
+        var user = await userRepository.GetUserByEmail(email);
+        if (user == null)
+        {
+            return Result.Failure(new Error("Can't find user", ErrorType.NotFound));
+        }
+        var documentPermissionExist = await permissionRepository.DeleteDocumentPermission(documentId, user.Id);
+        if (!documentPermissionExist)
+        {
+            return Result.Failure(new Error("Can't delete document permission", ErrorType.NotFound));
+        }
+        return Result.Success();
+        
     }
 }

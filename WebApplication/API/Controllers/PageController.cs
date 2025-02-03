@@ -11,7 +11,7 @@ public class PageController: ControllerBase
     {
         return File("index.html", "text/html");
     }
-
+    
     [HttpGet("/{documentId:guid}")]
     public IActionResult GetDocument()
     {

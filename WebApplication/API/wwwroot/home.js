@@ -1,5 +1,6 @@
 let documents = [];
 let currentDocumentId = null;
+let permissions = [];
 
 const documentList = document.getElementById('documentList');
 const createDocumentBtn = document.getElementById('createDocumentBtn');
@@ -33,8 +34,9 @@ closeModal.addEventListener('click', () => {
 
 // Закрытие модального окна при клике вне его
 window.addEventListener('click', (event) => {
-    if (event.target === documentModal) {
+    if (event.target === documentModal || event.target === userModal) {
         documentModal.style.display = 'none';
+        userModal.style.display = 'none';
     }
 });
 
@@ -91,12 +93,19 @@ async function renderDocuments() {
         permissionBtn.addEventListener('click', (e) => {
             currentDocumentId = e.currentTarget.parentElement.id;
             userModal.style.display = 'flex';
-        })
+        });
+        const viewBtn = document.createElement('button');
+        viewBtn.textContent = 'View';
+        viewBtn.addEventListener('click', async (e) => {
+            const id = e.currentTarget.parentElement.id;
+            await loadPermissions(id);
+        });
         li.id = doc.id;
         li.appendChild(a);
         li.appendChild(documentEditBtn);
         li.appendChild(documentDeleteBtn);
         li.appendChild(permissionBtn);
+        li.appendChild(viewBtn);
         documentList.appendChild(li);
         documentEditBtn.addEventListener('click', (event) => {
             const id = event.currentTarget.parentElement.id;
@@ -166,4 +175,47 @@ async function loadDocuments() {
         documents.push(doc);
     });
     await renderDocuments();
+}
+
+async function loadPermissions(pId){
+    const response = await fetch(`api/document/provide/get/${pId}`)
+    const data = await response.json();
+    permissions.push(data);
+    const modalListId = document.getElementById('modal-list-id');
+    data.provides.forEach(permission => {
+        const li = document.createElement('li');
+        li.classList.add('modal-item');
+        li.id = data.documentId;
+        const delBtn = document.createElement('button');
+        delBtn.textContent = 'Delete';
+        delBtn.classList.add('delete-btn');
+        delBtn.addEventListener('click', async (e) => {
+            const id = e.currentTarget.parentElement.id;
+            const email = permission.email;
+            const level = permission.level;
+            await deletePermission(e, id, email, level);
+        })
+        const emailSpan = document.createElement('span');
+        emailSpan.classList.add('email');
+        emailSpan.innerText = permission.email;
+        const levelSpan = document.createElement('span');
+        levelSpan.classList.add('access-level');
+        levelSpan.innerText = permission.level === 1 ? 'Read' : 'Edit';
+        li.appendChild(delBtn);
+        li.appendChild(emailSpan);
+        li.appendChild(levelSpan);
+        modalListId.appendChild(li);
+    })
+    document.getElementById('permissions').style.display = 'flex';
+}
+
+async function deletePermission(e, pId, email, level){
+    const response = await fetch(`api/document/provide/delete/${pId}`,{
+        method: 'DELETE',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email: email, accessLevel: level}),
+    });
+    if (response.ok) {
+        e.currentTarget.parentElement.remove();
+    }
 }
